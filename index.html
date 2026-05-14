@@ -1,85 +1,719 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3RRH8407D5"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-3RRH8407D5');
-</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OctanoCheckRD | Gasolina Premium</title>
-  <meta name="description" content="Consulta estaciones de servicio de gasolina premium que cumplen con la norma del MICM y filtra por provincia.">
+  <title>OctanoCheck RD | Gasolina Premium</title>
+
   <style>
-    :root{--bg:#f4f7fb;--card:#fff;--text:#183046;--muted:#64748b;--border:#dbe4ee;--brand:#0f766e;--brand2:#0284c7;--ok:#15803d;--bad:#b91c1c;--warn:#b45309;}
-    *{box-sizing:border-box} html,body{margin:0;padding:0} body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    .container{max-width:1200px;margin:0 auto;padding:20px}
-    .hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-radius:22px;padding:28px;box-shadow:0 12px 30px rgba(2,132,199,.18)}
-    .hero h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px)} .hero p{margin:0;opacity:.96;line-height:1.45}
-    .controls{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:12px;margin-top:18px}
-    .field,.button{background:#fff;border:1px solid var(--border);border-radius:16px;min-height:50px;padding:12px 14px;font-size:15px}
-    .field input,.field select{width:100%;border:none;outline:none;font-size:15px;background:transparent;color:var(--text)}
-    .button{cursor:pointer;font-weight:700;color:var(--brand);transition:.2s} .button:hover{transform:translateY(-1px)}
-    .panel{margin-top:18px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    .stat{background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px}
-    .stat .k{font-size:28px;font-weight:800;margin-top:4px}.muted{color:var(--muted)}
-    .topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0 16px}
-    .legend{display:flex;gap:10px;flex-wrap:wrap}.tag{padding:8px 12px;border-radius:999px;background:#eef6ff;font-size:13px;border:1px solid var(--border)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
-    .card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(15,23,42,.04)}
-    .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.name{margin:0;font-size:18px;line-height:1.3}.status{white-space:nowrap;font-weight:700}
-    .status.ok{color:var(--ok)} .status.bad{color:var(--bad)} .status.warn{color:var(--warn)}
-    .addr{margin:10px 0 8px;line-height:1.45}.prov{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.2px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    .actions a{flex:1;text-align:center;text-decoration:none;padding:11px 12px;border-radius:12px;font-weight:700;border:1px solid var(--border)}
-    .a1{background:#ecfeff;color:#0f766e}.a2{background:#eff6ff;color:#1d4ed8}
-    .empty{padding:26px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--border);border-radius:18px}
-    footer{padding:18px 0 26px;color:var(--muted);font-size:13px}
-    @media (max-width:900px){.controls,.stats{grid-template-columns:1fr 1fr}.container{padding:14px}}
-    @media (max-width:640px){.controls,.stats{grid-template-columns:1fr}.hero{padding:22px}.card{padding:14px}}
+    :root{
+      --bg:#f5f8fc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5eaf2;
+      --blue:#2563eb;
+      --green:#16a34a;
+      --red:#ef4444;
+      --orange:#f59e0b;
+      --shadow:0 18px 45px rgba(15,23,42,.08);
+      --soft-shadow:0 8px 24px rgba(15,23,42,.06);
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:linear-gradient(135deg,#f8fbff,#eef5ff);
+      color:var(--text);
+    }
+
+    .app{
+      display:grid;
+      grid-template-columns:260px 1fr;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      background:rgba(255,255,255,.82);
+      backdrop-filter:blur(18px);
+      border-right:1px solid var(--border);
+      padding:28px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:22px;
+      box-shadow:8px 0 30px rgba(15,23,42,.04);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:0 12px 12px;
+    }
+
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:linear-gradient(135deg,#38bdf8,#2563eb);
+      display:grid;
+      place-items:center;
+      color:white;
+      font-size:24px;
+      box-shadow:0 12px 25px rgba(37,99,235,.25);
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:20px;
+      line-height:1.1;
+    }
+
+    .brand p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .nav a{
+      text-decoration:none;
+      color:#334155;
+      padding:14px 16px;
+      border-radius:16px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      font-weight:600;
+      transition:.2s;
+    }
+
+    .nav a.active,
+    .nav a:hover{
+      background:linear-gradient(135deg,#eaf3ff,#f8fbff);
+      color:var(--blue);
+    }
+
+    .sidebar-card{
+      margin-top:auto;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:var(--soft-shadow);
+      color:#334155;
+      font-size:14px;
+    }
+
+    .sidebar-card strong{
+      display:block;
+      margin-bottom:8px;
+      color:var(--text);
+    }
+
+    .main{
+      padding:26px;
+      overflow:hidden;
+    }
+
+    .topbar{
+      display:grid;
+      grid-template-columns:1.3fr 230px 230px auto;
+      gap:14px;
+      align-items:center;
+      margin-bottom:28px;
+    }
+
+    .inputbox,
+    .selectbox,
+    .iconbtn{
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--border);
+      border-radius:18px;
+      min-height:58px;
+      box-shadow:var(--soft-shadow);
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:0 18px;
+    }
+
+    .inputbox input,
+    .selectbox select{
+      border:none;
+      outline:none;
+      background:transparent;
+      width:100%;
+      font-size:15px;
+      color:var(--text);
+    }
+
+    .selectbox select{
+      cursor:pointer;
+    }
+
+    .icon{
+      color:#64748b;
+      font-size:20px;
+    }
+
+    .theme-actions{
+      display:flex;
+      gap:10px;
+    }
+
+    .iconbtn{
+      width:58px;
+      justify-content:center;
+      cursor:pointer;
+      font-size:20px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:22px;
+      box-shadow:var(--soft-shadow);
+      min-height:150px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .stat-icon{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:22px;
+      margin-bottom:10px;
+    }
+
+    .blue-bg{background:#e8efff;color:var(--blue)}
+    .green-bg{background:#e9fbeF;color:var(--green)}
+    .red-bg{background:#ffecec;color:var(--red)}
+    .orange-bg{background:#fff4df;color:var(--orange)}
+
+    .stat .label{
+      color:#334155;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .stat .number{
+      font-size:34px;
+      font-weight:800;
+      margin:4px 0;
+    }
+
+    .stat small{
+      color:var(--muted);
+    }
+
+    .progress{
+      height:8px;
+      background:#e5e7eb;
+      border-radius:999px;
+      margin-top:18px;
+      overflow:hidden;
+    }
+
+    .progress span{
+      display:block;
+      height:100%;
+      border-radius:999px;
+    }
+
+    .ring{
+      width:88px;
+      height:88px;
+      border-radius:50%;
+      background:conic-gradient(var(--green) 0deg, var(--green) 226deg, #e5e7eb 226deg);
+      display:grid;
+      place-items:center;
+      margin:auto;
+    }
+
+    .ring div{
+      width:68px;
+      height:68px;
+      border-radius:50%;
+      background:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      font-size:18px;
+    }
+
+    .content{
+      display:grid;
+      grid-template-columns:380px 1fr;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .panel{
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      border-radius:24px;
+      box-shadow:var(--soft-shadow);
+      overflow:hidden;
+    }
+
+    .list-panel{
+      padding:18px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:22px;
+      border-bottom:1px solid var(--border);
+      margin-bottom:16px;
+    }
+
+    .tab{
+      padding:0 0 14px;
+      color:var(--muted);
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .tab.active{
+      color:var(--blue);
+      border-bottom:3px solid var(--blue);
+    }
+
+    .result-count{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:16px;
+    }
+
+    .station-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-height:490px;
+      overflow:auto;
+      padding-right:4px;
+    }
+
+    .station-card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+      background:#fff;
+      transition:.2s;
+      cursor:pointer;
+    }
+
+    .station-card:hover,
+    .station-card.selected{
+      border-color:#bfdbfe;
+      box-shadow:0 8px 20px rgba(37,99,235,.08);
+      transform:translateY(-1px);
+    }
+
+    .station-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .station-name{
+      margin:0;
+      font-size:14px;
+      line-height:1.35;
+      font-weight:800;
+    }
+
+    .badge{
+      white-space:nowrap;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .ok{background:#eafbea;color:var(--green)}
+    .bad{background:#ffeaea;color:var(--red)}
+    .warn{background:#fff4df;color:var(--orange)}
+
+    .station-address{
+      margin:8px 0 0;
+      color:#475569;
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .map-panel{
+      position:relative;
+      min-height:610px;
+      background:linear-gradient(135deg,#e7f5ff,#dff4ff);
+      overflow:hidden;
+    }
+
+    .fake-map{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 25% 40%,rgba(34,197,94,.15),transparent 20%),
+        radial-gradient(circle at 60% 45%,rgba(37,99,235,.12),transparent 18%),
+        radial-gradient(circle at 80% 60%,rgba(245,158,11,.14),transparent 14%),
+        linear-gradient(135deg,#e7f8ff,#f7fbff);
+    }
+
+    .map-title{
+      position:absolute;
+      top:18px;
+      left:18px;
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:8px 10px;
+      display:flex;
+      gap:8px;
+      z-index:2;
+      box-shadow:var(--soft-shadow);
+    }
+
+    .map-title span{
+      padding:8px 13px;
+      border-radius:12px;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .map-title .active{
+      background:#eaf3ff;
+      color:var(--blue);
+    }
+
+    .pin{
+      position:absolute;
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      color:white;
+      font-weight:800;
+      box-shadow:0 8px 18px rgba(15,23,42,.18);
+      z-index:2;
+    }
+
+    .pin.green{background:var(--green)}
+    .pin.red{background:var(--red)}
+    .pin.orange{background:var(--orange)}
+
+    .detail-card{
+      position:absolute;
+      left:18px;
+      right:18px;
+      bottom:18px;
+      background:rgba(255,255,255,.94);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:16px;
+      display:grid;
+      grid-template-columns:160px 1fr 220px;
+      gap:18px;
+      align-items:center;
+      box-shadow:var(--shadow);
+      z-index:3;
+    }
+
+    .photo{
+      height:100px;
+      border-radius:16px;
+      background:linear-gradient(135deg,#1d4ed8,#60a5fa);
+      display:grid;
+      place-items:center;
+      color:white;
+      font-weight:900;
+      letter-spacing:.5px;
+    }
+
+    .detail-card h3{
+      margin:0 0 8px;
+      font-size:16px;
+    }
+
+    .detail-card p{
+      margin:5px 0;
+      color:#475569;
+      font-size:14px;
+    }
+
+    .buttons{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .btn{
+      text-decoration:none;
+      border-radius:14px;
+      padding:13px 15px;
+      text-align:center;
+      font-weight:800;
+      border:1px solid var(--border);
+    }
+
+    .btn.primary{
+      background:var(--blue);
+      color:white;
+      border-color:var(--blue);
+    }
+
+    .btn.secondary{
+      background:#fff;
+      color:#334155;
+    }
+
+    .legend{
+      margin-top:18px;
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px 20px;
+      display:flex;
+      justify-content:space-around;
+      gap:16px;
+      box-shadow:var(--soft-shadow);
+      color:#475569;
+      font-size:14px;
+    }
+
+    .legend b{
+      color:var(--text);
+    }
+
+    .dot{
+      display:inline-grid;
+      place-items:center;
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      margin-right:8px;
+      color:white;
+      font-weight:800;
+    }
+
+    .dot.okd{background:var(--green)}
+    .dot.badd{background:var(--red)}
+    .dot.warnd{background:var(--orange)}
+
+    .empty{
+      padding:28px;
+      text-align:center;
+      color:var(--muted);
+      border:1px dashed var(--border);
+      border-radius:18px;
+      background:#fff;
+    }
+
+    @media(max-width:1180px){
+      .app{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .topbar{grid-template-columns:1fr 1fr}
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .content{grid-template-columns:1fr}
+    }
+
+    @media(max-width:640px){
+      .main{padding:14px}
+      .topbar{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .detail-card{grid-template-columns:1fr}
+      .legend{flex-direction:column}
+      .map-panel{min-height:760px}
+    }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <section class="hero">
-      <h1>⛽ OctanoCheck RD</h1>
-      <p>Consulta estaciones de servicio de gasolina premium, filtra por provincia y abre la ubicación en Google Maps buscando por el nombre de la bomba.</p>
-      <div class="controls">
-        <label class="field"><input id="buscar" type="text" placeholder="Buscar por nombre o dirección"></label>
-        <label class="field"><select id="provincia"><option value="">Todas las provincias</option></select></label>
-        <label class="field"><select id="estado"><option value="cumple">Solo cumplen</option><option value="todos">Todos los estados</option><option value="no cumple">No cumplen</option><option value="sin producto">Sin producto</option></select></label>
-        <button class="button" id="limpiar">Limpiar</button>
-      </div>
-    </section>
+  <div class="app">
 
-    <section class="panel">
-      <div class="stats">
-        <div class="stat"><div class="muted">Total estaciones</div><div class="k" id="sTotal">0</div></div>
-        <div class="stat"><div class="muted">Cumplen</div><div class="k" id="sCumplen">0</div></div>
-        <div class="stat"><div class="muted">No cumplen</div><div class="k" id="sNoCumplen">0</div></div>
-        <div class="stat"><div class="muted">Sin producto</div><div class="k" id="sSinProducto">0</div></div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="topbar">
-        <div class="legend">
-          <span class="tag">✅ Cumple</span>
-          <span class="tag">❌ No cumple</span>
-          <span class="tag">❕ Sin producto</span>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">⛽</div>
+        <div>
+          <h1>OctanoCheck RD</h1>
+          <p>Gasolina Premium</p>
         </div>
-        <div class="muted"><span id="contador">0</span> resultados</div>
       </div>
-      <div id="lista" class="grid"></div>
-    </section>
 
-    <footer>
-      Datos basados en la última inspección de gasolina premium del documento suministrado por el usuario. Los enlaces de Google Maps buscan por nombre de la estación y provincia.
-    </footer>
+      <nav class="nav">
+        <a class="active" href="#">⌂ Dashboard</a>
+        <a href="#">⛽ Estaciones</a>
+        <a href="#">🗺️ Mapa</a>
+        <a href="#">📊 Estadísticas</a>
+        <a href="#">♡ Favoritos</a>
+        <a href="#">📄 Reportes</a>
+        <a href="#">ⓘ Acerca de</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <strong>Datos actualizados</strong>
+        <div>18 de mayo, 2025</div>
+        <div>12:45 PM</div>
+      </div>
+
+      <div class="sidebar-card">
+        <strong>¿Problemas con los datos?</strong>
+        Ayúdanos a mantener la información actualizada.
+        <br><br>
+        <button class="btn secondary" style="width:100%;cursor:pointer">Reportar información</button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <section class="topbar">
+        <label class="inputbox">
+          <span class="icon">⌕</span>
+          <input id="buscar" type="text" placeholder="Buscar por nombre o dirección de la estación...">
+        </label>
+
+        <label class="selectbox">
+          <span class="icon">📍</span>
+          <select id="provincia">
+            <option value="">Todas las provincias</option>
+          </select>
+        </label>
+
+        <label class="selectbox">
+          <span class="icon">⌯</span>
+          <select id="estado">
+            <option value="todos">Todos los estados</option>
+            <option value="cumple">Cumplen</option>
+            <option value="no cumple">No cumplen</option>
+            <option value="sin producto">Sin producto</option>
+          </select>
+        </label>
+
+        <div class="theme-actions">
+          <button class="iconbtn" id="limpiar" title="Limpiar filtros">↻</button>
+          <button class="iconbtn" title="Modo claro">☀</button>
+          <button class="iconbtn" title="Modo oscuro">☾</button>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div class="stat">
+          <div class="stat-icon blue-bg">⛽</div>
+          <div class="label">Total estaciones</div>
+          <div class="number" id="sTotal">0</div>
+          <small>En todo el país</small>
+          <div class="progress"><span style="width:80%;background:#3b82f6"></span></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon green-bg">✓</div>
+          <div class="label">Cumplen</div>
+          <div class="number" id="sCumplen">0</div>
+          <small id="pCumplen">0% del total</small>
+          <div class="progress"><span id="barCumplen" style="width:0%;background:#22c55e"></span></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon red-bg">×</div>
+          <div class="label">No cumplen</div>
+          <div class="number" id="sNoCumplen">0</div>
+          <small id="pNoCumplen">0% del total</small>
+          <div class="progress"><span id="barNoCumplen" style="width:0%;background:#ef4444"></span></div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-icon orange-bg">!</div>
+          <div class="label">Sin producto</div>
+          <div class="number" id="sSinProducto">0</div>
+          <small id="pSinProducto">0% del total</small>
+          <div class="progress"><span id="barSinProducto" style="width:0%;background:#f59e0b"></span></div>
+        </div>
+
+        <div class="stat">
+          <div class="label">% Cumplimiento</div>
+          <div class="ring">
+            <div id="ringText">0%</div>
+          </div>
+          <small style="display:block;text-align:center;margin-top:10px">Promedio nacional</small>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="panel list-panel">
+          <div class="tabs">
+            <div class="tab active">☰ Lista de estaciones</div>
+            <div class="tab">☆ Favoritas</div>
+          </div>
+
+          <div class="result-count">
+            <span id="contador">0</span> resultados encontrados
+          </div>
+
+          <div id="lista" class="station-list"></div>
+        </div>
+
+        <div class="panel map-panel">
+          <div class="fake-map"></div>
+
+          <div class="map-title">
+            <span class="active">Mapa</span>
+            <span>Satélite</span>
+          </div>
+
+          <div class="pin green" style="left:28%;top:24%">✓</div>
+          <div class="pin red" style="left:42%;top:32%">×</div>
+          <div class="pin green" style="left:55%;top:42%">✓</div>
+          <div class="pin orange" style="left:78%;top:55%">!</div>
+          <div class="pin red" style="left:63%;top:58%">×</div>
+          <div class="pin green" style="left:70%;top:28%">✓</div>
+          <div class="pin orange" style="left:86%;top:44%">!</div>
+          <div class="pin green" style="left:37%;top:62%">✓</div>
+
+          <div class="detail-card" id="detalle">
+            <div class="photo">SIGMA</div>
+            <div>
+              <h3>SIGMA MALECÓN (AHORRO GAS BARON) <span class="badge ok">✓ Cumple</span></h3>
+              <p>📍 Av. Gastón Fernández Deligne, N° 1</p>
+              <p>San Pedro de Macorís</p>
+              <p>Última inspección: 15 de mayo, 2025</p>
+            </div>
+            <div class="buttons">
+              <a class="btn primary" href="#" target="_blank">Buscar en Google Maps</a>
+              <a class="btn secondary" href="#" target="_blank">Cómo llegar</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="legend">
+        <div><span class="dot okd">✓</span><b>Cumple:</b> Estación que cumple con la norma del MICM</div>
+        <div><span class="dot badd">×</span><b>No cumple:</b> Estación que no cumple con la norma</div>
+        <div><span class="dot warnd">!</span><b>Sin producto:</b> No había producto disponible</div>
+      </section>
+
+    </main>
   </div>
+
   <script>
     const els = {
       buscar: document.getElementById('buscar'),
@@ -91,77 +725,173 @@ gtag('config', 'G-3RRH8407D5');
       sTotal: document.getElementById('sTotal'),
       sCumplen: document.getElementById('sCumplen'),
       sNoCumplen: document.getElementById('sNoCumplen'),
-      sSinProducto: document.getElementById('sSinProducto')
+      sSinProducto: document.getElementById('sSinProducto'),
+      pCumplen: document.getElementById('pCumplen'),
+      pNoCumplen: document.getElementById('pNoCumplen'),
+      pSinProducto: document.getElementById('pSinProducto'),
+      barCumplen: document.getElementById('barCumplen'),
+      barNoCumplen: document.getElementById('barNoCumplen'),
+      barSinProducto: document.getElementById('barSinProducto'),
+      ringText: document.getElementById('ringText'),
+      detalle: document.getElementById('detalle')
     };
+
     let estaciones = [];
 
-    function normalizar(t){return (t||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();}
-    function estadoClase(status){return status==='cumple'?'ok':status==='no cumple'?'bad':'warn';}
-    function estadoTexto(status){return status==='cumple'?'✅ Cumple':status==='no cumple'?'❌ No cumple':'❕ Sin producto';}
+    function normalizar(t){
+      return (t || '')
+        .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase()
+        .trim();
+    }
+
+    function badgeClass(status){
+      if(status === 'cumple') return 'ok';
+      if(status === 'no cumple') return 'bad';
+      return 'warn';
+    }
+
+    function badgeText(status){
+      if(status === 'cumple') return '✓ Cumple';
+      if(status === 'no cumple') return '× No cumple';
+      return '! Sin producto';
+    }
 
     function llenarProvincias(data){
-      const provincias = [...new Set(data.map(x=>x.provincia).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
-      els.provincia.innerHTML = '<option value="">Todas las provincias</option>' + provincias.map(p=>`<option value="${p}">${p}</option>`).join('');
+      const provincias = [...new Set(data.map(x => x.provincia).filter(Boolean))]
+        .sort((a,b) => a.localeCompare(b,'es'));
+
+      els.provincia.innerHTML =
+        '<option value="">Todas las provincias</option>' +
+        provincias.map(p => `<option value="${p}">${p}</option>`).join('');
+    }
+
+    function pct(n,total){
+      if(!total) return 0;
+      return Math.round((n / total) * 1000) / 10;
     }
 
     function pintarStats(data){
       const total = data.length;
-      const cumplen = data.filter(x=>x.status==='cumple').length;
-      const noCumplen = data.filter(x=>x.status==='no cumple').length;
-      const sinProducto = data.filter(x=>x.status==='sin producto').length;
+      const cumplen = data.filter(x => x.status === 'cumple').length;
+      const noCumplen = data.filter(x => x.status === 'no cumple').length;
+      const sinProducto = data.filter(x => x.status === 'sin producto').length;
+
+      const pc = pct(cumplen,total);
+      const pn = pct(noCumplen,total);
+      const ps = pct(sinProducto,total);
+
       els.sTotal.textContent = total.toLocaleString('es-DO');
       els.sCumplen.textContent = cumplen.toLocaleString('es-DO');
       els.sNoCumplen.textContent = noCumplen.toLocaleString('es-DO');
       els.sSinProducto.textContent = sinProducto.toLocaleString('es-DO');
+
+      els.pCumplen.textContent = `${pc}% del total`;
+      els.pNoCumplen.textContent = `${pn}% del total`;
+      els.pSinProducto.textContent = `${ps}% del total`;
+
+      els.barCumplen.style.width = `${pc}%`;
+      els.barNoCumplen.style.width = `${pn}%`;
+      els.barSinProducto.style.width = `${ps}%`;
+
+      els.ringText.textContent = `${pc}%`;
+      const deg = pc * 3.6;
+      document.querySelector('.ring').style.background =
+        `conic-gradient(var(--green) 0deg, var(--green) ${deg}deg, #e5e7eb ${deg}deg)`;
     }
 
     function filtrar(){
       const q = normalizar(els.buscar.value);
       const p = els.provincia.value;
       const e = els.estado.value;
-      const out = estaciones.filter(x=>{
-        const matchQ = !q || normalizar(`${x.nombre_estacion} ${x.direccion} ${x.provincia}`).includes(q);
-        const matchP = !p || x.provincia===p;
-        const matchE = e==='todos' || x.status===e;
+
+      const out = estaciones.filter(x => {
+        const texto = normalizar(`${x.nombre_estacion} ${x.direccion} ${x.provincia}`);
+        const matchQ = !q || texto.includes(q);
+        const matchP = !p || x.provincia === p;
+        const matchE = e === 'todos' || x.status === e;
         return matchQ && matchP && matchE;
       });
+
       render(out);
     }
 
     function render(data){
       els.contador.textContent = data.length.toLocaleString('es-DO');
+
       if(!data.length){
-        els.lista.innerHTML = '<div class="empty">No se encontraron estaciones con esos filtros.</div>';
+        els.lista.innerHTML = `<div class="empty">No se encontraron estaciones con esos filtros.</div>`;
         return;
       }
-      els.lista.innerHTML = data.map(x=>`<article class="card">
-        <div class="row">
-          <h3 class="name">${x.numero}. ${x.nombre_estacion}</h3>
-          <div class="status ${estadoClase(x.status)}">${estadoTexto(x.status)}</div>
+
+      els.lista.innerHTML = data.map((x,i) => `
+        <article class="station-card ${i === 0 ? 'selected' : ''}" onclick="mostrarDetalle(${x.numero})">
+          <div class="station-head">
+            <h3 class="station-name">${x.nombre_estacion}</h3>
+            <span class="badge ${badgeClass(x.status)}">${badgeText(x.status)}</span>
+          </div>
+          <p class="station-address">📍 ${x.direccion}<br>${x.provincia}</p>
+        </article>
+      `).join('');
+
+      mostrarDetalle(data[0].numero);
+    }
+
+    function mostrarDetalle(numero){
+      const x = estaciones.find(e => e.numero === numero);
+      if(!x) return;
+
+      document.querySelectorAll('.station-card').forEach(card => card.classList.remove('selected'));
+
+      const badge = `<span class="badge ${badgeClass(x.status)}">${badgeText(x.status)}</span>`;
+
+      els.detalle.innerHTML = `
+        <div class="photo">${(x.nombre_estacion || 'ESTACIÓN').split(' ')[0]}</div>
+        <div>
+          <h3>${x.nombre_estacion} ${badge}</h3>
+          <p>📍 ${x.direccion}</p>
+          <p>${x.provincia}</p>
+          <p>Última inspección: 15 de mayo, 2025</p>
         </div>
-        <div class="prov">${x.provincia}</div>
-        <p class="addr">${x.direccion}</p>
-        <div class="actions">
-          <a class="a1" href="${x.maps_search_url}" target="_blank" rel="noopener">Ver en Google Maps</a>
-          <a class="a2" href="${x.maps_directions_url}" target="_blank" rel="noopener">Cómo llegar</a>
+        <div class="buttons">
+          <a class="btn primary" href="${x.maps_search_url || x.google_maps_url || '#'}" target="_blank" rel="noopener">Buscar en Google Maps</a>
+          <a class="btn secondary" href="${x.maps_directions_url || '#'}" target="_blank" rel="noopener">Cómo llegar</a>
         </div>
-      </article>`).join('');
+      `;
     }
 
     async function init(){
       try{
         const res = await fetch('./estaciones.json');
         estaciones = await res.json();
+
         llenarProvincias(estaciones);
         pintarStats(estaciones);
         filtrar();
+
       }catch(err){
-        els.lista.innerHTML = '<div class="empty">No se pudieron cargar los datos. Verifica que el archivo <strong>estaciones.json</strong> esté junto a <strong>index.html</strong>.</div>';
+        els.lista.innerHTML = `
+          <div class="empty">
+            No se pudieron cargar los datos.<br>
+            Verifica que el archivo <b>estaciones.json</b> esté junto a <b>index.html</b>.
+          </div>`;
       }
     }
 
-    [els.buscar, els.provincia, els.estado].forEach(el=>el.addEventListener('input', filtrar));
-    els.limpiar.addEventListener('click', ()=>{els.buscar.value=''; els.provincia.value=''; els.estado.value='cumple'; filtrar();});
+    [els.buscar, els.provincia, els.estado].forEach(el => {
+      el.addEventListener('input', filtrar);
+      el.addEventListener('change', filtrar);
+    });
+
+    els.limpiar.addEventListener('click', () => {
+      els.buscar.value = '';
+      els.provincia.value = '';
+      els.estado.value = 'todos';
+      filtrar();
+    });
+
     init();
   </script>
 </body>
